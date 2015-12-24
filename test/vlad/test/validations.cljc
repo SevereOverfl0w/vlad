@@ -16,6 +16,7 @@
     (v/attr [:number-of-teeth] (v/present {:warning true}))
     [{:type :vlad.core/present
       :selector [:number-of-teeth]
+      :invalid-data 32
       :warning true}]
 
     (v/attr [:age] (v/present))
@@ -28,6 +29,7 @@
     (v/attr [:name] (v/length-over 9 {:severity :warning}))
     [{:type :vlad.core/length-over
       :size 9
+      :invalid-data "Chris"
       :selector [:name]
       :severity :warning}]
 
@@ -37,6 +39,7 @@
     (v/attr [:name] (v/length-under 4 {:severity :major}))
     [{:type :vlad.core/length-under
       :size 4
+      :invalid-data "Chris"
       :selector [:name]
       :severity :major}]
 
@@ -46,10 +49,12 @@
     (v/attr [:name] (v/length-in 9 4 {:foo :bar}))
     [{:type :vlad.core/length-over
       :size 9
+      :invalid-data "Chris"
       :selector [:name]
       :foo :bar}
      {:type :vlad.core/length-under
       :size 4
+      :invalid-data "Chris"
       :selector [:name]
       :foo :bar}]
 
@@ -59,6 +64,7 @@
     (v/attr [:name] (v/one-of #{"Thelma" "Luise"}))
     [{:type :vlad.core/one-of
       :set #{"Thelma" "Luise"}
+      :invalid-data "Chris"
       :selector [:name]}]
 
     (v/attr [:name] (v/not-of #{"Thelma" "Luise"}))
@@ -67,6 +73,7 @@
     (v/attr [:name] (v/not-of #{"Chris" "Fred"}))
     [{:type :vlad.core/not-of
       :set #{"Chris" "Fred"}
+      :invalid-data "Chris"
       :selector [:name]}]
 
     (v/attr [:name] (v/equals-value "Chris"))
@@ -75,6 +82,7 @@
     (v/attr [:name] (v/equals-value "Maddy"))
     [{:type :vlad.core/equals-value
       :value "Maddy"
+      :invalid-data "Chris"
       :selector [:name]}]
 
     (v/equals-field [:name] [:name])

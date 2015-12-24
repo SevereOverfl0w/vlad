@@ -76,7 +76,7 @@
   ([] valid)
   ([left] left)
   ([left right] (Chain. left right))
-  ([left right & validations] (reduce #(Chain. %1 %2) (Chain. left right) validations)) )
+  ([left right & validations] (reduce #(Chain. %1 %2) (Chain. left right) validations)))
 
 ;; Predicates are simple functions that take some data and return a boolean
 ;; value. They're ideal for use as validators and so `Predicate` exists to make
@@ -85,10 +85,14 @@
 (defrecord Predicate [predicate information]
   Validation
   (validate [{:keys [predicate information]} data]
-    (if (predicate data) [information] [])))
+    (if (predicate data)
+      [(merge information (when data {:invalid-data data}))]
+      [])))
 
 (defn predicate
-  "Examples:
+  "A predicate automatically adds a :invalid-data key, with the data the failed
+   the validation. This is useful for including the failed data in your messages.
+   Examples:
     (predicate #(> size (count %))
                {:type ::length-over :size size})
 
@@ -121,7 +125,7 @@
    (predicate #(if (string? %) (str/blank? %) true)
               (merge {:type ::present} error-data))))
 
-(defn length-over 
+(defn length-over
   "Checks that the `count` of the value is over `size`."
   ([size]
    (length-over size {}))
@@ -129,7 +133,7 @@
    (predicate #(> size (count %))
               (merge {:type ::length-over :size size} error-data))))
 
-(defn length-under 
+(defn length-under
   "Checks that the `count` of the value is under `size`."
   ([size]
    (length-under size {}))
@@ -137,7 +141,7 @@
    (predicate #(< size (count %))
               (merge {:type ::length-under :size size} error-data))))
 
-(defn length-in 
+(defn length-in
   "Checks that the `count` of the value is over `lower` and under `upper`. No
   checking is done that `lower` is lower than `upper`. This validator may
   return multiple errors"
@@ -263,11 +267,11 @@
 
    Example:
 
-    (translate-errors [{
+    (translate-errors [{}]
       :type :vlad.core/length-under
       :selector [:password]
       :name \"Password\"
-      :size 8}])
+      :size 8))
     ; => {[:password] \"Password must be under 8 characters long.\"}"
   [errors translation]
   (reduce (fn [output-map {:keys [selector] :as error}]
